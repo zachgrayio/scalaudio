@@ -3,7 +3,7 @@ package scalaudio.units
 import scalaudio.core.engine.AudioFunctionGraph
 import scalaudio.core.types.{AudioDuration, Frame}
 import scalaudio.core.{AudioContext, CoreSyntax}
-import scalaudio.units.io.Playback
+import scalaudio.units.io.{Playback, Recording}
 
 /**
   * Created by johnmcgill on 12/6/16.
@@ -16,6 +16,16 @@ trait AmpSyntax extends CoreSyntax {
 
     AudioFunctionGraph(
       frameFunc.andThen(playbackFunc)
+    ).play(duration)
+  }
+
+  def record(fileName: String, frameFunc: Unit => Frame, duration: AudioDuration)(implicit audioContext: AudioContext): Unit = {
+    AudioFunctionGraph(
+      frameFunc.andThen(
+        Recording(fileName)
+          .asFunction
+          .withModifier(Array(), (state: Frame, input: Frame) => input)
+      )
     ).play(duration)
   }
 
